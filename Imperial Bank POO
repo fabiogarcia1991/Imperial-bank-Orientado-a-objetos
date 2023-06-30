@@ -1,0 +1,207 @@
+import abc
+import datetime
+
+class cliente:
+    def __init__(self):
+        self.contas = []
+
+    def realizar_transação(self, conta, transação):
+        transação.registrar(conta)
+
+    def adicionar_conta(self, conta):
+        self.contas.append(conta)
+
+class pessoa_física(cliente):
+    def __init__(self, nome, data_nasc, cpf, endereço):
+        self.nome = nome
+        self.data_nasc = data_nasc
+        self.cpf = cpf
+        self.endereço = endereço
+        print('Cliente registrado com sucesso')
+
+class conta:
+    def __init__(self, número, cliente, senha, histórico=None):
+        self._saldo = 0
+        self._número = número
+        self._agência = '0001'
+        self._cliente = cliente
+        self._senha = senha
+        self._histórico = histórico()
+
+        @classmethod
+        def nova_conta(cls, cliente, número):
+            return cls(número, cliente)
+
+        @property
+        def saldo(self):
+            return self._saldo
+
+        @property
+        def número(self):
+            return self._número
+
+        @property
+        def agência(self):
+            return self._agência
+
+        @property
+        def cliente(self):
+            return self._cliente
+
+        @property
+        def senha(self):
+            return self._senha
+
+        @property
+        def histórico(self):
+            return self._histórico
+
+    def sacar(self, valor, senha):
+        saldo = self.saldo
+        senha = self.senha
+        excedeu_saldo = valor > saldo
+
+        for senha in self.senhas:
+            if self.senha == {'Senha:'}:
+                return True
+            if True:
+                pass
+            else:
+                print('Senha incorreta, por favor tente novamente')
+
+        if excedeu_saldo:
+            print('Operação falhou, você não possui saldo suficiente para efetuar essa transação'.upper())
+        elif valor > 0:
+            self._saldo -= valor
+            print('Saque realizado com sucesso!'.upper())
+            return True
+        else:
+            print('Operação falhou, o valor informado é inválido!'.upper())
+            return False
+
+    def depositar(self, valor, senha):
+        for senha in self.senhas:
+            if self.senha == {'Senha:'}:
+                return True
+            if True:
+                pass
+            else:
+                print('Senha incorreta, por favor tente novamente')
+        if valor > 0:
+            self._saldo += valor
+            print('Depósito efetuado com sucesso!'.upper())
+        else:
+            print('Operação falhou, o valor informado é inválido!'.upper())
+
+class senha(conta):
+    def __init__(self, número, cliente):
+        super().__init__(número, cliente)
+        self.número = número
+        self.cliente = cliente
+        self.senha = senha()
+        self._cliente = []
+        self._senhas = []
+
+    @classmethod
+    def nova_senha(cls, self, número, cliente, senha):
+        return cls(número, cliente, senha)
+
+    def cadastrar_senha(self, cliente, número, senha):
+        self.senhas.append({'Cliente': self.cliente, 'Número': self.número, 'Senha': self.senha})
+        self.cliente.append(self.senhas)
+
+    def verificar_senha(self):
+        for senha in self._senhas in self._cliente:
+            if self.senha == self.senha:
+                print('Você já possui uma senha idêntica cadastrada em outra conta. '
+                      'Por favor cadastre uma senha diferente'.upper())
+            else:
+                print('Senha cadastrada com sucesso!'.upper())
+                return True
+
+
+class conta_corrente(conta):
+    def __init__(self, número, cliente, senha, limite=500, limite_saques=3):
+        super().__init__(número, cliente, senha)
+        self.limite = limite
+        self.limite_saques = limite_saques
+
+    def sacar(self, valor, senha):
+        for senha in self.senhas:
+            if self.senha == {'Senha:'}:
+                return True
+            if True:
+                pass
+            else:
+                print('Senha incorreta, por favor tente novamente')
+
+        número_saques = len(
+        [transação for transação in self.histórico.transações if transação['Tipo'] == saque._name_]
+        )
+        excedeu_limite = valor > self.limite
+        excedeu_saques = número_saques > self.limite_saques
+
+        if excedeu_limite:
+            print(f'Operação falhou, o limite máximo permitido para saques é de R${self.limite}')
+        elif excedeu_saques:
+            print('Operação falhou, você já ultrapassou o número permitido de saques.'
+                  'Em caso de emergência ligue para a sua agência'.upper())
+        else:
+            return super().sacar(valor)
+        return False
+
+    def __str__(self):
+        return f'''\
+        Agência:\t {self.agência}
+        c\c:\t\t {self.número}
+        Titular: \t {self.nome}
+    '''
+
+class histórico:
+    def __init__(self):
+        self._transações = []
+
+    @property
+    def transações(self):
+        return self._transações
+
+    def adicionar_transação(self, transação):
+        self._transações.append(
+            {'Tipo': transação._class_._name_,
+             'Valor': transação.valor,
+             'Data': datetime.now().strftime,
+            }
+        )
+class transação:
+    @property
+    @abc.abstractmethod
+    def valor(self):
+        pass
+
+    @abc.abstractmethod
+    def registrar(self, conta):
+        pass
+
+class saque(transação):
+    def __init__(self, valor):
+        @property
+        def valor(self):
+            return self._valor
+
+        def registrar(self, conta):
+            sucesso_transação = conta.sacar(self.valor)
+            if sucesso_transação:
+                conta._histórico.adicionar_transação(self)
+
+class depósito(transação):
+    def __init__(self, valor):
+        self._valor = valor
+
+    @property
+    def valor(self):
+        return self._valor
+
+    def registrar(self, conta):
+        sucesso_transação = conta.depositar(self.valor)
+        if sucesso_transação:
+            conta.histórico.adicionar_transação(self)
